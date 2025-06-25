@@ -7,18 +7,24 @@ export default function Transactions() {
   const [showModal, setShowModal] = useState(false);
 
   const getTransactions = useCallback(async () => {
-    const transactions = await fetchTransactions();
-    let balance = 0;
-    if (transactions) {
-      const computed = transactions
-        .slice()
-        .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
-        .map((tx) => {
-          balance = tx.type === "credit" ? balance + tx.amount : balance - tx.amount;
-          return { ...tx, balance };
-        })
-        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-      setTxs(computed);
+    try {
+      const transactions = await fetchTransactions();
+      let balance = 0;
+      if (transactions) {
+        const computed = transactions
+          .slice()
+          .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
+          .map((tx) => {
+            balance = tx.type === "credit" ? balance + tx.amount : balance - tx.amount;
+            return { ...tx, balance };
+          })
+          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        setTxs(computed);
+      } else {
+        setTxs([]);
+      }
+    } catch {
+      setTxs([]);
     }
   }, []);
 
